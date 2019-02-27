@@ -4,6 +4,7 @@ import android.content.Context
 import android.databinding.DataBindingUtil
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import com.example.jobfinder.R
 import com.example.jobfinder.data.JobGitHub
@@ -11,8 +12,12 @@ import com.example.jobfinder.databinding.ItemJobBinding
 import com.example.jobfinder.viewmodel.ItemJobViewModel
 import com.squareup.picasso.Picasso
 
-class JobsAdapter(var context: Context) : RecyclerView.Adapter<JobsAdapter.JobsAdapterViewHolder>() {
+class JobsAdapter(var context: Context,var clickListener: ClickListener) : RecyclerView.Adapter<JobsAdapter.JobsAdapterViewHolder>() {
     var jobGitHubs: List<JobGitHub> = ArrayList()
+
+    interface ClickListener{
+        fun clickedOnJob(url:String)
+    }
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): JobsAdapterViewHolder {
         var itemJobBinding: ItemJobBinding =
             DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.item_job, p0, false)
@@ -32,11 +37,16 @@ class JobsAdapter(var context: Context) : RecyclerView.Adapter<JobsAdapter.JobsA
         p0.bind(jobGitHubs[p1])
     }
 
-    inner class JobsAdapterViewHolder(var binding: ItemJobBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class JobsAdapterViewHolder(var binding: ItemJobBinding) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
+        override fun onClick(v: View?) {
+            clickListener.clickedOnJob(viewModel.gitHub!!.url)
+        }
+
         var viewModel: ItemJobViewModel = ItemJobViewModel()
 
         init {
             binding.viewModel = viewModel
+            binding.root.setOnClickListener(this)
         }
 
         fun bind(item: JobGitHub) {

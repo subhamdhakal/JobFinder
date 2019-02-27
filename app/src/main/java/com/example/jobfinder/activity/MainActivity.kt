@@ -1,5 +1,6 @@
 package com.example.jobfinder.activity
 
+import android.content.Intent
 import android.location.Location
 import android.os.Bundle
 import android.support.design.widget.NavigationView
@@ -8,6 +9,7 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -45,24 +47,44 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         )
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
+        search_view_search_job.queryHint="Search"
+
         nav_view.setNavigationItemSelectedListener(this)
-        adapter=JobsAdapter(this)
+        adapter=JobsAdapter(this,object:JobsAdapter.ClickListener{
+            override fun clickedOnJob(url: String) {
+                val intent=Intent(this@MainActivity,JobDetail::class.java)
+                intent.putExtra("url",url)
+                startActivity(intent)
+            }
+        })
         recycler_view_jobs.adapter=adapter
         recycler_view_jobs.layoutManager = LinearLayoutManager(this)
-//        Log.d(TAG," hello"+mainActivityVM.getGitHubJobs())
         fetchLocation()
-        mainActivityVM.getGitHubJobs()
+        search_view_search_job.setOnQueryTextListener(object:SearchView.OnQueryTextListener{
+            override fun onQueryTextChange(p0: String?): Boolean {
+                return true
+            }
+            override fun onQueryTextSubmit(p0: String?): Boolean {
+                Toast.makeText(this@MainActivity, "Submitted:$p0" ,Toast.LENGTH_SHORT).show()
+                mainActivityVM.getGitHubJobs(p0,null,null)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        adapter.setData(it)
+                    },{
+                        it.printStackTrace()
+                    })
+                return false
+            }
+        })
+        mainActivityVM.getGitHubJobs(null,null,null)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                Log.d(TAG,"hello"+it)
                 adapter.setData(it)
             },{
                 it.printStackTrace()
             })
-
-
-//        mainActivityVM.getGitHubJobs()
 
 
     }

@@ -8,8 +8,8 @@ import javax.inject.Inject
 
 class MainActivityVM @Inject constructor(var repository: Repository) {
 
-    fun getGitHubJobs(): Observable<List<JobGitHub>> {
-        return repository.getGitHubJobs()
+    fun getGitHubJobs(position:String?,lat:String?,long:String?): Observable<List<JobGitHub>> {
+        return repository.getGitHubJobs(position,lat,long)
             .flatMap {
                 getGovJob(it)
             }
