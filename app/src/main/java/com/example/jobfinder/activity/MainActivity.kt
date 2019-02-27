@@ -1,5 +1,6 @@
 package com.example.jobfinder.activity
 
+import android.location.Location
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
@@ -10,8 +11,11 @@ import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import com.example.jobfinder.R
 import com.example.jobfinder.adapter.JobsAdapter
+import com.example.jobfinder.api.LocationInterface
+import com.example.jobfinder.utils.LocationUtil
 import com.example.jobfinder.vm.MainActivityVM
 import dagger.android.AndroidInjection
 import io.reactivex.Observable
@@ -27,6 +31,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     @Inject
     lateinit var mainActivityVM: MainActivityVM
     lateinit var adapter: JobsAdapter
+    var locationUtil=LocationUtil(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -45,6 +50,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         recycler_view_jobs.adapter=adapter
         recycler_view_jobs.layoutManager = LinearLayoutManager(this)
 //        Log.d(TAG," hello"+mainActivityVM.getGitHubJobs())
+        fetchLocation()
         mainActivityVM.getGitHubJobs()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -59,6 +65,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //        mainActivityVM.getGitHubJobs()
 
 
+    }
+    fun fetchLocation(){
+        locationUtil= LocationUtil(this)
+        locationUtil.setListener(object :LocationInterface{
+            override fun getLocation(location: Location?) {
+                Toast.makeText(this@MainActivity,"location:$location",Toast.LENGTH_SHORT).show()
+            }
+        })
+        locationUtil.Permission()
     }
 
     override fun onBackPressed() {

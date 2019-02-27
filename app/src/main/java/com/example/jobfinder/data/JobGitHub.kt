@@ -10,5 +10,6 @@ data class JobGitHub(
     var company: String,
     var company_url: String,
     var location:String,
-    var company_logo:String
+    var company_logo:String,
+    var title:String
 )
