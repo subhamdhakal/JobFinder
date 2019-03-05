@@ -1,6 +1,7 @@
 package com.example.jobfinder.viewmodel
 
 import com.example.jobfinder.data.JobGitHub
+import com.example.jobfinder.utils.getFormattedStringFromTimeStamp
 
 
 class ItemJobViewModel {
@@ -19,7 +20,7 @@ class ItemJobViewModel {
     }
 
     fun getPostDate(): String {
-        return gitHub!!.created_at
+        return gitHub!!.created_at.toLong().getFormattedStringFromTimeStamp()
     }
 
 
